@@ -21,19 +21,30 @@ func (f *Facade) ScheduleCourse(command *usecases.ScheduleCourseCommand) (*useca
 }
 
 func (f *Facade) CancelCourse(command *usecases.CancelCourseCommand) (*usecases.CancelCourseCommandResponse, error) {
-	handler := &usecases.CancelCourseCommandHandler{}
+	handler := &usecases.CancelCourseCommandHandler{
+		CourseRepository: f.CourseRepository,
+		EventsPublisher:  f.EventsPublisher,
+	}
 
 	return handler.Handle(command)
 }
 
 func (f *Facade) Enroll(command *usecases.EnrollCommand) (*usecases.EnrollCommandResponse, error) {
-	handler := &usecases.EnrollCommandHandler{}
+	handler := &usecases.EnrollCommandHandler{
+		CourseRepository:     f.CourseRepository,
+		EnrollmentRepository: f.EnrollmentRepository,
+		EventsPublisher:      f.EventsPublisher,
+	}
 
 	return handler.Handle(command)
 }
 
 func (f *Facade) CancelEnrollment(command *usecases.CancelEnrollmentCommand) (*usecases.CancelEnrollmentCommandResponse, error) {
-	handler := &usecases.CancelEnrollmentCommandHandler{}
+	handler := &usecases.CancelEnrollmentCommandHandler{
+		CourseRepository:     f.CourseRepository,
+		EnrollmentRepository: f.EnrollmentRepository,
+		EventsPublisher:      f.EventsPublisher,
+	}
 
 	return handler.Handle(command)
 }

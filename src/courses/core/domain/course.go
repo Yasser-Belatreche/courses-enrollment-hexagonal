@@ -51,7 +51,7 @@ func ScheduleCourse(name string, minSize int, maxSize int) (*Course, error) {
 		events:           make([]CourseEvent[interface{}], 0),
 	}
 
-	course.addEvent(NewCourseScheduledEvent(course))
+	course.addEvent(CourseScheduledEvent(course))
 
 	return course, nil
 }
@@ -66,6 +66,82 @@ func CourseFromState(state *CourseState) *Course {
 		status:           CourseStatus(state.Status),
 		events:           make([]CourseEvent[interface{}], 0),
 	}
+}
+
+func (c *Course) Enroll(Student string, saveEnrollment func(enrollment *Enrollment) error) (*Enrollment, error) {
+	if c.totalEnrollments == c.maxSize {
+		return nil, errors.New("course is full")
+	}
+
+	if c.status == CourseCancelled {
+		return nil, errors.New("course is cancelled")
+	}
+
+	if Student == "" {
+		return nil, errors.New("student cannot be empty")
+	}
+
+	enrollment := &Enrollment{
+		Id:       lib.GenerateUlid(),
+		Student:  Student,
+		CourseId: c.id,
+	}
+
+	err := saveEnrollment(enrollment)
+	if err != nil {
+		return nil, err
+	}
+
+	c.totalEnrollments += 1
+
+	if c.totalEnrollments >= c.minSize && c.status != CourseViable {
+		c.status = CourseViable
+
+		c.addEvent(CourseBecameViableEvent(c))
+	}
+
+	c.addEvent(EnrolledInCourseEvent(c, enrollment))
+
+	return enrollment, nil
+}
+
+func (c *Course) CancelEnrollment(enrollment *Enrollment, deleteEnrollment func(enrollment *Enrollment) error) error {
+	if c.status == CourseCancelled {
+		return errors.New("course is cancelled")
+	}
+
+	if enrollment.CourseId != c.id {
+		return errors.New("enrollment does not belong to this course")
+	}
+
+	err := deleteEnrollment(enrollment)
+	if err != nil {
+		return err
+	}
+
+	c.totalEnrollments -= 1
+
+	if c.totalEnrollments < c.minSize && c.status == CourseViable {
+		c.status = CourseNotViable
+
+		c.addEvent(CourseNotViableAnymoreEvent(c))
+	}
+
+	c.addEvent(CourseEnrollmentCancelledEvent(c, enrollment))
+
+	return nil
+}
+
+func (c *Course) Cancel() error {
+	if c.status == CourseCancelled {
+		return errors.New("course is cancelled")
+	}
+
+	c.status = CourseCancelled
+
+	c.addEvent(CourseCancelledEvent(c))
+
+	return nil
 }
 
 func (c *Course) State() *CourseState {

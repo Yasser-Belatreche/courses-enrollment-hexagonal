@@ -13,23 +13,23 @@ type CourseEvent[T interface{}] struct {
 	EventId    string
 }
 
-func NewCourseBecameViableEvent(course *Course) *CourseEvent[interface{}] {
-	return newCourseEvent[interface{}](events.CourseBecameViableEventType, events.CourseBecameViableEventPayload{Id: course.id})
-}
-
-func NewCourseNotViableAnymoreEvent(course *Course) *CourseEvent[interface{}] {
-	return newCourseEvent[interface{}](events.CourseNotViableAnymoreEventType, events.CourseNotViableAnymoreEventPayload{Id: course.id})
-}
-
-func NewCourseScheduledEvent(course *Course) *CourseEvent[interface{}] {
+func CourseScheduledEvent(course *Course) *CourseEvent[interface{}] {
 	return newCourseEvent[interface{}](events.CourseScheduledEventType, events.CourseScheduledEventPayload{Id: course.id})
 }
 
-func NewCourseCancelledEvent(course *Course) *CourseEvent[interface{}] {
+func CourseBecameViableEvent(course *Course) *CourseEvent[interface{}] {
+	return newCourseEvent[interface{}](events.CourseBecameViableEventType, events.CourseBecameViableEventPayload{Id: course.id})
+}
+
+func CourseNotViableAnymoreEvent(course *Course) *CourseEvent[interface{}] {
+	return newCourseEvent[interface{}](events.CourseNotViableAnymoreEventType, events.CourseNotViableAnymoreEventPayload{Id: course.id})
+}
+
+func CourseCancelledEvent(course *Course) *CourseEvent[interface{}] {
 	return newCourseEvent[interface{}](events.CourseCancelledEventType, events.CourseCancelledEventPayload{Id: course.id})
 }
 
-func NewEnrolledInCourseEvent(course *Course, enrollment *Enrollment) *CourseEvent[interface{}] {
+func EnrolledInCourseEvent(course *Course, enrollment *Enrollment) *CourseEvent[interface{}] {
 	return newCourseEvent[interface{}](events.EnrolledInCourseEventType, events.EnrolledInCourseEventPayload{
 		CourseId:     course.id,
 		EnrollmentId: enrollment.Id,
@@ -37,7 +37,7 @@ func NewEnrolledInCourseEvent(course *Course, enrollment *Enrollment) *CourseEve
 	})
 }
 
-func NewCourseEnrollmentCancelledEvent(course *Course, enrollment *Enrollment) *CourseEvent[interface{}] {
+func CourseEnrollmentCancelledEvent(course *Course, enrollment *Enrollment) *CourseEvent[interface{}] {
 	return newCourseEvent[interface{}](events.CourseEnrollmentCancelledEventType, events.CourseEnrollmentCancelledEventPayload{
 		CourseId:     course.id,
 		EnrollmentId: enrollment.Id,

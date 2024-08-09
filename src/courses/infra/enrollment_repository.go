@@ -1,6 +1,9 @@
 package infra
 
-import "github.com/Yasser-Belatreche/courses-enrollment-hexagonal/src/courses/core/domain"
+import (
+	"errors"
+	"github.com/Yasser-Belatreche/courses-enrollment-hexagonal/src/courses/core/domain"
+)
 
 func NewFakeEnrollmentRepository() domain.EnrollmentRepository {
 	return &inMemoryEnrollmentRepository{
@@ -19,7 +22,13 @@ func (i *inMemoryEnrollmentRepository) Create(enrollment *domain.Enrollment) err
 }
 
 func (i *inMemoryEnrollmentRepository) FindById(id string) (*domain.Enrollment, error) {
-	return i.enrollments[id], nil
+	enrollment := i.enrollments[id]
+
+	if enrollment == nil {
+		return nil, errors.New("enrollment not found")
+	}
+
+	return enrollment, nil
 }
 
 func (i *inMemoryEnrollmentRepository) Delete(id string) error {
